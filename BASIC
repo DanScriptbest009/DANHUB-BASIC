@@ -5,9 +5,10 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = player
-local Mouse = LocalPlayer:GetMouse()
 local Camera = workspace.CurrentCamera
+local TweenService = game:GetService("TweenService")
 
+local isMobile = userInputService.TouchEnabled
 local perfectShootEnabled = false
 local aimKillEnabled = false
 local espEnabled = false
@@ -17,6 +18,7 @@ local oldIndex = nil
 local highlightObjects = {}
 local autoShootLastTime = 0
 local autoShootDelay = 0.05
+local localTeamCache = nil
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "DANHUB"
@@ -39,53 +41,101 @@ btnCorner.CornerRadius = UDim.new(1, 0)
 btnCorner.Parent = button
 
 local btnStroke = Instance.new("UIStroke")
-btnStroke.Thickness = 2.5
-btnStroke.Color = Color3.fromRGB(200, 100, 255)
+btnStroke.Thickness = 4
+btnStroke.Color = Color3.fromRGB(255, 100, 255)
+btnStroke.Transparency = 0.2
 btnStroke.Parent = button
 
 local btnGradient = Instance.new("UIGradient")
 btnGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 70, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(230, 150, 255))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 200)),
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(190, 90, 255)),
+    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(255, 100, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 50, 220))
 }
 btnGradient.Parent = btnStroke
 
+local btnGlow = Instance.new("ImageLabel")
+btnGlow.Size = UDim2.new(1.4, 0, 1.4, 0)
+btnGlow.Position = UDim2.new(-0.2, 0, -0.2, 0)
+btnGlow.BackgroundTransparency = 1
+btnGlow.Image = "rbxassetid://13135718668"
+btnGlow.ImageColor3 = Color3.fromRGB(255, 100, 255)
+btnGlow.ImageTransparency = 0.4
+btnGlow.ZIndex = 0
+btnGlow.Parent = button
+
 task.spawn(function()
     while true do
-        btnGradient.Rotation = (btnGradient.Rotation + 3) % 360
-        task.wait(0.03)
+        btnGradient.Rotation = (btnGradient.Rotation + 4) % 360
+        btnStroke.Transparency = 0.1 + math.sin(tick() * 5) * 0.15
+        btnGlow.ImageTransparency = 0.3 + math.sin(tick() * 4) * 0.2
+        btnGlow.ImageColor3 = Color3.fromRGB(255, 100 + math.sin(tick() * 5) * 50, 255)
+        button.ImageColor3 = Color3.fromRGB(200 + math.sin(tick() * 4) * 40, 90 + math.sin(tick() * 5) * 30, 255)
+        task.wait(0.02)
     end
+end)
+
+button.MouseEnter:Connect(function()
+    TweenService:Create(button, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 62, 0, 62)}):Play()
+    TweenService:Create(btnStroke, TweenInfo.new(0.15), {Thickness = 5, Transparency = 0}):Play()
+    TweenService:Create(btnGlow, TweenInfo.new(0.15), {ImageTransparency = 0.2}):Play()
+end)
+
+button.MouseLeave:Connect(function()
+    TweenService:Create(button, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 55, 0, 55)}):Play()
+    TweenService:Create(btnStroke, TweenInfo.new(0.15), {Thickness = 4, Transparency = 0.2}):Play()
+    TweenService:Create(btnGlow, TweenInfo.new(0.15), {ImageTransparency = 0.4}):Play()
 end)
 
 local menu = Instance.new("Frame")
 menu.Name = "MenuPopup"
-menu.Size = UDim2.new(0, 260, 0, 415)
-menu.BackgroundColor3 = Color3.fromRGB(20, 16, 32)
+menu.Size = UDim2.new(0, 260, 0, 400)
+menu.BackgroundColor3 = Color3.fromRGB(35, 30, 50)
 menu.BackgroundTransparency = 0.05
 menu.Visible = false
 menu.Parent = screenGui
 
 local menuCorner = Instance.new("UICorner")
-menuCorner.CornerRadius = UDim.new(0, 12)
+menuCorner.CornerRadius = UDim.new(0, 15)
 menuCorner.Parent = menu
 
 local menuStroke = Instance.new("UIStroke")
-menuStroke.Thickness = 2
-menuStroke.Color = Color3.fromRGB(190, 90, 255)
+menuStroke.Thickness = 3
+menuStroke.Color = Color3.fromRGB(180, 80, 255)
+menuStroke.Transparency = 0.3
 menuStroke.Parent = menu
 
 local menuGradient = Instance.new("UIGradient")
 menuGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(190, 90, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 50, 220))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 80, 255)),
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(160, 70, 220)),
+    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(200, 90, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 50, 200))
 }
 menuGradient.Rotation = 0
 menuGradient.Parent = menuStroke
 
+local menuGlow = Instance.new("ImageLabel")
+menuGlow.Size = UDim2.new(1.08, 0, 1.08, 0)
+menuGlow.Position = UDim2.new(-0.04, 0, -0.04, 0)
+menuGlow.BackgroundTransparency = 1
+menuGlow.Image = "rbxassetid://13135718668"
+menuGlow.ImageColor3 = Color3.fromRGB(180, 80, 255)
+menuGlow.ImageTransparency = 0.6
+menuGlow.ZIndex = 0
+menuGlow.Parent = menu
+
 task.spawn(function()
     while true do
         menuGradient.Rotation = (menuGradient.Rotation + 2) % 360
-        task.wait(0.025)
+        menuStroke.Transparency = 0.2 + math.sin(tick() * 4) * 0.15
+        menuGlow.ImageTransparency = 0.4 + math.sin(tick() * 3) * 0.2
+        menuGlow.ImageColor3 = Color3.fromRGB(180 + math.sin(tick() * 4) * 50, 80 + math.sin(tick() * 4) * 40, 255)
+        if menu.Visible then
+            menu.BackgroundColor3 = Color3.fromRGB(35 + math.sin(tick() * 2) * 5, 30 + math.sin(tick() * 2.5) * 4, 50 + math.sin(tick() * 3) * 8)
+        end
+        task.wait(0.02)
     end
 end)
 
@@ -101,119 +151,233 @@ local imgCorner = Instance.new("UICorner")
 imgCorner.CornerRadius = UDim.new(1, 0)
 imgCorner.Parent = menuImg
 
+local imgGlow = Instance.new("ImageLabel")
+imgGlow.Size = UDim2.new(1.3, 0, 1.3, 0)
+imgGlow.Position = UDim2.new(-0.15, 0, -0.15, 0)
+imgGlow.BackgroundTransparency = 1
+imgGlow.Image = "rbxassetid://13135718668"
+imgGlow.ImageColor3 = Color3.fromRGB(255, 150, 255)
+imgGlow.ImageTransparency = 0.4
+imgGlow.ZIndex = 0
+imgGlow.Parent = menuImg
+
+local imgPulse = TweenService:Create(menuImg, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {ImageColor3 = Color3.fromRGB(255, 180, 255)})
+imgPulse:Play()
+
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 50)
-header.Position = UDim2.new(0, 0, 0, 58)
-header.BackgroundColor3 = Color3.fromRGB(150, 70, 230)
+header.Position = UDim2.new(0, 0, 0, 57)
+header.BackgroundColor3 = Color3.fromRGB(180, 70, 255)
 header.Parent = menu
 
 local headerCorner = Instance.new("UICorner")
-headerCorner.CornerRadius = UDim.new(0, 12)
+headerCorner.CornerRadius = UDim.new(0, 15)
 headerCorner.Parent = header
 
+local headerGradient = Instance.new("UIGradient")
+headerGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 70, 255)),
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(220, 100, 255)),
+    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(200, 80, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 70, 255))
+}
+headerGradient.Rotation = 0
+headerGradient.Parent = header
+
+task.spawn(function()
+    while true do
+        headerGradient.Rotation = (headerGradient.Rotation + 2.5) % 360
+        header.BackgroundColor3 = Color3.fromRGB(180 + math.sin(tick() * 4) * 30, 70 + math.sin(tick() * 5) * 20, 255)
+        task.wait(0.02)
+    end
+end)
+
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -15, 1, 0)
-title.Position = UDim2.new(0, 8, 0, 0)
+title.Size = UDim2.new(1, -10, 1, 0)
+title.Position = UDim2.new(0, 5, 0, 0)
 title.BackgroundTransparency = 1
-title.Text = "DANHUB 2026"
+title.Text = "DANHUB"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 15
 title.Font = Enum.Font.GothamBold
+title.TextStrokeTransparency = 0.3
+title.TextStrokeColor3 = Color3.fromRGB(255, 0, 255)
 title.Parent = header
+
+local titleGlow = Instance.new("ImageLabel")
+titleGlow.Size = UDim2.new(1, 0, 2, 0)
+titleGlow.Position = UDim2.new(0, 0, -0.5, 0)
+titleGlow.BackgroundTransparency = 1
+titleGlow.Image = "rbxassetid://13135718668"
+titleGlow.ImageColor3 = Color3.fromRGB(255, 150, 255)
+titleGlow.ImageTransparency = 0.5
+titleGlow.ZIndex = 0
+titleGlow.Parent = title
 
 local function createBtn(text, yPos)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 55)
+    btn.Size = UDim2.new(0.9, 0, 0, 48)
     btn.Position = UDim2.new(0.05, 0, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(32, 28, 48)
-    btn.Text = text
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.TextSize = 14
+    btn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
+    btn.Text = text .. "  ○ OFF"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 13
     btn.Font = Enum.Font.GothamBold
+    btn.TextXAlignment = Enum.TextXAlignment.Left
     btn.Parent = menu
-
+    
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 10)
     corner.Parent = btn
-
+    
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(190, 90, 255)
-    stroke.Thickness = 1.5
-    stroke.Transparency = 0.5
+    stroke.Color = Color3.fromRGB(200, 100, 255)
+    stroke.Thickness = 2
+    stroke.Transparency = 0.3
     stroke.Parent = btn
-
+    
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(110, 80, 160)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 70, 150))
+    }
+    gradient.Parent = btn
+    
+    local btnGlow = Instance.new("ImageLabel")
+    btnGlow.Size = UDim2.new(1.05, 0, 1.05, 0)
+    btnGlow.Position = UDim2.new(-0.025, 0, -0.025, 0)
+    btnGlow.BackgroundTransparency = 1
+    btnGlow.Image = "rbxassetid://13135718668"
+    btnGlow.ImageColor3 = Color3.fromRGB(200, 100, 255)
+    btnGlow.ImageTransparency = 0.7
+    btnGlow.ZIndex = 0
+    btnGlow.Parent = btn
+    
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.12, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0.92, 0, 0, 52)}):Play()
+        TweenService:Create(stroke, TweenInfo.new(0.12), {Thickness = 3, Transparency = 0}):Play()
+        TweenService:Create(btnGlow, TweenInfo.new(0.12), {ImageTransparency = 0.4}):Play()
+        TweenService:Create(btn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(120, 90, 170)}):Play()
+    end)
+    
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.12, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0.9, 0, 0, 48)}):Play()
+        TweenService:Create(stroke, TweenInfo.new(0.12), {Thickness = 2, Transparency = 0.3}):Play()
+        TweenService:Create(btnGlow, TweenInfo.new(0.12), {ImageTransparency = 0.7}):Play()
+        if not perfectShootEnabled and btn == perfectShootBtn then
+            TweenService:Create(btn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
+        elseif not autoShootEnabled and btn == autoShootBtn then
+            TweenService:Create(btn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
+        elseif not espEnabled and btn == espBtn then
+            TweenService:Create(btn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
+        elseif not aimKillEnabled and btn == aimKillBtn then
+            TweenService:Create(btn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
+        end
+    end)
+    
     return btn, stroke
 end
 
-local perfectShootBtn, psStroke = createBtn("PERFECT SHOOT   OFF", 115)
-local autoShootBtn, asStroke = createBtn("AUTO SHOOT   OFF", 180)
-local espBtn, espStroke = createBtn("CHAMS ESP   OFF", 245)
-local aimKillBtn, akStroke = createBtn("AIM KILL   OFF", 310)
+local perfectShootBtn, psStroke = createBtn("  PERFECT SHOOT", 115)
+local autoShootBtn, asStroke = createBtn("  AUTO SHOOT", 170)
+local espBtn, espStroke = createBtn("  CHAMS ESP", 225)
+local aimKillBtn, akStroke = createBtn("  AIM KILL", 280)
 
 local creditsBtn = Instance.new("TextButton")
-creditsBtn.Size = UDim2.new(0.42, 0, 0, 38)
-creditsBtn.Position = UDim2.new(0.05, 0, 0, 375)
-creditsBtn.BackgroundColor3 = Color3.fromRGB(35, 30, 55)
-creditsBtn.Text = "CREDITOS"
-creditsBtn.TextColor3 = Color3.new(1,1,1)
+creditsBtn.Size = UDim2.new(0.42, 0, 0, 35)
+creditsBtn.Position = UDim2.new(0.05, 0, 0, 345)
+creditsBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
+creditsBtn.Text = "★ CREDITOS ★"
+creditsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 creditsBtn.TextSize = 12
 creditsBtn.Font = Enum.Font.GothamBold
 creditsBtn.Parent = menu
 
 local versionBtn = Instance.new("TextButton")
-versionBtn.Size = UDim2.new(0.42, 0, 0, 38)
-versionBtn.Position = UDim2.new(0.53, 0, 0, 375)
-versionBtn.BackgroundColor3 = Color3.fromRGB(35, 30, 55)
-versionBtn.Text = "V2.0.0"
-versionBtn.TextColor3 = Color3.new(1,1,1)
+versionBtn.Size = UDim2.new(0.42, 0, 0, 35)
+versionBtn.Position = UDim2.new(0.53, 0, 0, 345)
+versionBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
+versionBtn.Text = "🔧 V2.5.0"
+versionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 versionBtn.TextSize = 12
 versionBtn.Font = Enum.Font.GothamBold
 versionBtn.Parent = menu
 
 for _, b in ipairs({creditsBtn, versionBtn}) do
     local c = Instance.new("UICorner")
-    c.CornerRadius = UDim.new(0, 7)
+    c.CornerRadius = UDim.new(0, 8)
     c.Parent = b
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(200, 100, 255)
+    stroke.Thickness = 1.5
+    stroke.Transparency = 0.4
+    stroke.Parent = b
 end
 
 local creditsFrame = Instance.new("Frame")
-creditsFrame.Size = UDim2.new(0, 300, 0, 380)
-creditsFrame.Position = UDim2.new(0.5, -150, 0.5, -190)
-creditsFrame.BackgroundColor3 = Color3.fromRGB(20, 16, 32)
+creditsFrame.Size = UDim2.new(0, 280, 0, 300)
+creditsFrame.Position = UDim2.new(0.5, -140, 0.5, -150)
+creditsFrame.BackgroundColor3 = Color3.fromRGB(35, 30, 50)
+creditsFrame.BackgroundTransparency = 0
 creditsFrame.Visible = false
 creditsFrame.Parent = screenGui
 
 local cfCorner = Instance.new("UICorner")
-cfCorner.CornerRadius = UDim.new(0, 12)
+cfCorner.CornerRadius = UDim.new(0, 15)
 cfCorner.Parent = creditsFrame
 
 local cfStroke = Instance.new("UIStroke")
-cfStroke.Color = Color3.fromRGB(190, 90, 255)
-cfStroke.Thickness = 2
+cfStroke.Color = Color3.fromRGB(200, 100, 255)
+cfStroke.Thickness = 3
+cfStroke.Transparency = 0.3
 cfStroke.Parent = creditsFrame
 
+local cfGradient = Instance.new("UIGradient")
+cfGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 80, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 50, 200))
+}
+cfGradient.Rotation = 0
+cfGradient.Parent = cfStroke
+
+task.spawn(function()
+    while true do
+        cfGradient.Rotation = (cfGradient.Rotation + 2) % 360
+        cfStroke.Transparency = 0.2 + math.sin(tick() * 4) * 0.15
+        task.wait(0.02)
+    end
+end)
+
 local cfHeader = Instance.new("Frame")
-cfHeader.Size = UDim2.new(1, 0, 0, 45)
-cfHeader.BackgroundColor3 = Color3.fromRGB(150, 70, 230)
+cfHeader.Size = UDim2.new(1, 0, 0, 40)
+cfHeader.BackgroundColor3 = Color3.fromRGB(180, 70, 255)
 cfHeader.Parent = creditsFrame
 
 local cfHeaderCorner = Instance.new("UICorner")
-cfHeaderCorner.CornerRadius = UDim.new(0, 12)
+cfHeaderCorner.CornerRadius = UDim.new(0, 15)
 cfHeaderCorner.Parent = cfHeader
+
+local cfHeaderGradient = Instance.new("UIGradient")
+cfHeaderGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 70, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 100, 255))
+}
+cfHeaderGradient.Rotation = 45
+cfHeaderGradient.Parent = cfHeader
 
 local cfTitle = Instance.new("TextLabel")
 cfTitle.Size = UDim2.new(1, 0, 1, 0)
 cfTitle.BackgroundTransparency = 1
-cfTitle.Text = "CREDITOS"
+cfTitle.Text = "★ CREDITOS ★"
 cfTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-cfTitle.TextSize = 18
+cfTitle.TextSize = 15
 cfTitle.Font = Enum.Font.GothamBold
 cfTitle.Parent = cfHeader
 
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -38, 0, 8)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 100)
+closeBtn.Position = UDim2.new(1, -38, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(220, 50, 80)
 closeBtn.Text = "✕"
 closeBtn.TextColor3 = Color3.new(1,1,1)
 closeBtn.TextSize = 16
@@ -221,24 +385,34 @@ closeBtn.Font = Enum.Font.GothamBold
 closeBtn.Parent = cfHeader
 
 local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.CornerRadius = UDim.new(0, 8)
 closeCorner.Parent = closeBtn
 
+closeBtn.MouseEnter:Connect(function()
+    TweenService:Create(closeBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 50, 80)}):Play()
+    TweenService:Create(closeBtn, TweenInfo.new(0.1), {Size = UDim2.new(0, 32, 0, 32)}):Play()
+end)
+
+closeBtn.MouseLeave:Connect(function()
+    TweenService:Create(closeBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(220, 50, 80)}):Play()
+    TweenService:Create(closeBtn, TweenInfo.new(0.1), {Size = UDim2.new(0, 30, 0, 30)}):Play()
+end)
+
 local creditsScroll = Instance.new("ScrollingFrame")
-creditsScroll.Size = UDim2.new(0.95, 0, 0.76, 0)
+creditsScroll.Size = UDim2.new(0.95, 0, 0.74, 0)
 creditsScroll.Position = UDim2.new(0.025, 0, 0.14, 0)
 creditsScroll.BackgroundTransparency = 1
-creditsScroll.CanvasSize = UDim2.new(0, 0, 0, 350)
+creditsScroll.CanvasSize = UDim2.new(0, 0, 0, 280)
 creditsScroll.ScrollBarThickness = 4
-creditsScroll.ScrollBarImageColor3 = Color3.fromRGB(190, 90, 255)
+creditsScroll.ScrollBarImageColor3 = Color3.fromRGB(200, 100, 255)
 creditsScroll.Parent = creditsFrame
 
 local function addCredit(parent, yPos, labelText, copyText)
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, 0, 0, 50)
+    frame.Size = UDim2.new(1, 0, 0, 45)
     frame.Position = UDim2.new(0, 0, 0, yPos)
-    frame.BackgroundColor3 = Color3.fromRGB(30, 26, 45)
-    frame.BackgroundTransparency = 0.3
+    frame.BackgroundColor3 = Color3.fromRGB(55, 50, 75)
+    frame.BackgroundTransparency = 0.2
     frame.Parent = parent
     
     local frameCorner = Instance.new("UICorner")
@@ -250,16 +424,16 @@ local function addCredit(parent, yPos, labelText, copyText)
     textLabel.Position = UDim2.new(0.02, 0, 0, 0)
     textLabel.BackgroundTransparency = 1
     textLabel.Text = labelText
-    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.TextColor3 = Color3.fromRGB(255, 230, 200)
     textLabel.TextSize = 11
     textLabel.TextXAlignment = Enum.TextXAlignment.Left
-    textLabel.Font = Enum.Font.Gotham
+    textLabel.Font = Enum.Font.GothamBold
     textLabel.Parent = frame
     
     local copyBtn = Instance.new("TextButton")
     copyBtn.Size = UDim2.new(0.28, 0, 0.6, 0)
     copyBtn.Position = UDim2.new(0.7, 0, 0.2, 0)
-    copyBtn.BackgroundColor3 = Color3.fromRGB(190, 90, 255)
+    copyBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
     copyBtn.Text = "COPIAR"
     copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     copyBtn.TextSize = 10
@@ -269,6 +443,14 @@ local function addCredit(parent, yPos, labelText, copyText)
     local copyCorner = Instance.new("UICorner")
     copyCorner.CornerRadius = UDim.new(0, 6)
     copyCorner.Parent = copyBtn
+    
+    copyBtn.MouseEnter:Connect(function()
+        TweenService:Create(copyBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(255, 150, 255)}):Play()
+    end)
+    
+    copyBtn.MouseLeave:Connect(function()
+        TweenService:Create(copyBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(200, 100, 255)}):Play()
+    end)
     
     copyBtn.MouseButton1Click:Connect(function()
         local success = false
@@ -281,27 +463,27 @@ local function addCredit(parent, yPos, labelText, copyText)
         end
         if success then
             copyBtn.Text = "✓"
-            copyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+            copyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
             task.wait(1)
             copyBtn.Text = "COPIAR"
-            copyBtn.BackgroundColor3 = Color3.fromRGB(190, 90, 255)
+            copyBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
         end
     end)
 end
 
-addCredit(creditsScroll, 5, "TIK TOK CREATOR", "dan8198_1")
-addCredit(creditsScroll, 60, "TO AMEYAL AND XYRA", "AMEYAL & XYRA")
-addCredit(creditsScroll, 115, "TIK TOK JOS PRO", "jxsescripts")
-addCredit(creditsScroll, 170, "DISCORD DANHUB", "https://discord.gg/wr47QTUVFZ")
-addCredit(creditsScroll, 225, "DISCORD CO CREATOR", "https://discord.gg/eJZQc9SkWG")
+addCredit(creditsScroll, 5, "🔥 TIK TOK CREATOR", "dan8198_1")
+addCredit(creditsScroll, 52, "⚡ TO AMEYAL AND XYRA", "AMEYAL & XYRA")
+addCredit(creditsScroll, 99, "🎯 TIK TOK JOS PRO", "jxsescripts")
+addCredit(creditsScroll, 146, "💬 DISCORD DANHUB", "https://discord.gg/wr47QTUVFZ")
+addCredit(creditsScroll, 193, "🤝 DISCORD CO CREATOR", "https://discord.gg/eJZQc9SkWG")
 
 local thanksCredit = Instance.new("TextLabel")
 thanksCredit.Size = UDim2.new(1, 0, 0, 35)
-thanksCredit.Position = UDim2.new(0, 0, 0, 280)
+thanksCredit.Position = UDim2.new(0, 0, 0, 242)
 thanksCredit.BackgroundTransparency = 1
-thanksCredit.Text = "GRACIAS POR USAR DANHUB 2026"
-thanksCredit.TextColor3 = Color3.fromRGB(190, 90, 255)
-thanksCredit.TextSize = 10
+thanksCredit.Text = "❤️ GRACIAS POR USAR ❤️"
+thanksCredit.TextColor3 = Color3.fromRGB(200, 150, 255)
+thanksCredit.TextSize = 11
 thanksCredit.Font = Enum.Font.GothamBold
 thanksCredit.Parent = creditsScroll
 
@@ -314,6 +496,7 @@ end
 local dragging = false
 local dragStart
 local startPos
+local dragInput
 
 local function updateDrag(input)
     local delta = input.Position - dragStart
@@ -330,6 +513,15 @@ button.InputBegan:Connect(function(input)
         dragging = true
         dragStart = input.Position
         startPos = button.Position
+        TweenService:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 60, 0, 60)}):Play()
+    end
+end)
+
+button.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if not dragging then return end
+        dragging = false
+        TweenService:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 55, 0, 55)}):Play()
     end
 end)
 
@@ -346,7 +538,7 @@ userInputService.InputChanged:Connect(function(input)
 end)
 
 userInputService.InputEnded:Connect(function(input)
-    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
         player:SetAttribute("ButtonPosX", button.Position.X.Offset)
         player:SetAttribute("ButtonPosY", button.Position.Y.Offset)
@@ -405,25 +597,35 @@ end)
 
 button.MouseButton1Click:Connect(function()
     if creditsFrame.Visible then
+        TweenService:Create(creditsFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
+        task.wait(0.15)
         creditsFrame.Visible = false
     end
     if menu.Visible then
+        TweenService:Create(menu, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
+        task.wait(0.1)
         menu.Visible = false
     else
         local buttonPos = button.AbsolutePosition
         local menuSize = menu.AbsoluteSize
         local targetX = buttonPos.X - menuSize.X - 5
         local targetY = buttonPos.Y - 20
-        menu.Position = UDim2.new(0, targetX, 0, targetY - 63)
+        menu.Position = UDim2.new(0, targetX, 0, targetY - 55)
+        menu.BackgroundTransparency = 0.05
         menu.Visible = true
+        TweenService:Create(menu, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.05}):Play()
     end
 end)
 
 creditsBtn.MouseButton1Click:Connect(function()
+    creditsFrame.BackgroundTransparency = 0
     creditsFrame.Visible = true
+    TweenService:Create(creditsFrame, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
 end)
 
 closeBtn.MouseButton1Click:Connect(function()
+    TweenService:Create(creditsFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
+    task.wait(0.15)
     creditsFrame.Visible = false
 end)
 
@@ -448,9 +650,17 @@ local function getLocalTeam()
     return nil
 end
 
+local function refreshLocalTeam()
+    localTeamCache = getLocalTeam()
+    return localTeamCache
+end
+
 local function isEnemy(targetPlayer)
-    local localTeam = getLocalTeam()
-    if not localTeam then return false end
+    if localTeamCache == nil then
+        refreshLocalTeam()
+    end
+    
+    if localTeamCache == nil then return false end
     
     local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
     if not playerGui then return false end
@@ -466,11 +676,11 @@ local function isEnemy(targetPlayer)
     
     local targetName = targetPlayer.Name
     
-    if localTeam == "Red" then
+    if localTeamCache == "Red" then
         if teamBlue and teamBlue:FindFirstChild(targetName) then
             return true
         end
-    elseif localTeam == "Blue" then
+    elseif localTeamCache == "Blue" then
         if teamRed and teamRed:FindFirstChild(targetName) then
             return true
         end
@@ -506,17 +716,26 @@ local function isEnemyVisibleFromPlayer(targetPart)
     return false
 end
 
-local function getBestTarget()
+local function getScreenCenter()
+    local viewportSize = workspace.CurrentCamera.ViewportSize
+    return Vector2.new(viewportSize.X / 2, viewportSize.Y / 2)
+end
+
+local function getBestTargetPerfect()
     local target = nil
     local shortestDistance = math.huge
+    local center = getScreenCenter()
+    
     for _, v in pairs(Players:GetPlayers()) do
-        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
             if isEnemy(v) then
-                local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
-                if onScreen and isEnemyVisibleFromPlayer(v.Character.Head) then
-                    local distance = (Vector2.new(pos.X,pos.Y) - Vector2.new(Mouse.X,Mouse.Y)).Magnitude
+                local targetPart = v.Character.HumanoidRootPart
+                local pos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
+                
+                if onScreen and isEnemyVisibleFromPlayer(targetPart) then
+                    local distance = (Vector2.new(pos.X, pos.Y) - center).Magnitude
                     if distance < shortestDistance then
-                        target = v.Character.Head
+                        target = targetPart
                         shortestDistance = distance
                     end
                 end
@@ -619,14 +838,17 @@ end
 local function toggleAutoShoot()
     if autoShootEnabled then
         disableAutoShoot()
-        autoShootBtn.Text = "AUTO SHOOT   OFF"
-        autoShootBtn.BackgroundColor3 = Color3.fromRGB(32, 28, 48)
-        asStroke.Transparency = 0.5
+        autoShootBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
+        asStroke.Transparency = 0.3
+        autoShootBtn.Text = "  AUTO SHOOT  ○ OFF"
+        TweenService:Create(autoShootBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
     else
         enableAutoShoot()
-        autoShootBtn.Text = "AUTO SHOOT   ON"
-        autoShootBtn.BackgroundColor3 = Color3.fromRGB(190, 90, 255)
+        autoShootBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         asStroke.Transparency = 0
+        autoShootBtn.Text = "  AUTO SHOOT  ● ON"
+        TweenService:Create(autoShootBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(0, 255, 0)}):Play()
+        TweenService:Create(autoShootBtn, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundColor3 = Color3.fromRGB(0, 255, 100)}):Play()
     end
 end
 
@@ -636,10 +858,14 @@ local function enablePerfectShoot()
     oldIndex = mt.__index
     setreadonly(mt, false)
     mt.__index = newcclosure(function(self, index)
-        if self == Mouse and (index == "Hit" or index == "Target") then
-            local target = getBestTarget()
-            if target then
-                return (index == "Hit" and target.CFrame or target)
+        if (index == "Hit" or index == "Target") then
+            local targetPart = getBestTargetPerfect()
+            if targetPart and targetPart.Parent and targetPart.Parent:FindFirstChild("Humanoid") and targetPart.Parent.Humanoid.Health > 0 then
+                if index == "Hit" then
+                    return targetPart.CFrame
+                else
+                    return targetPart
+                end
             end
         end
         return oldIndex(self, index)
@@ -688,6 +914,8 @@ end
 local function updateESP()
     if not espEnabled then return end
     
+    refreshLocalTeam()
+    
     for _, otherPlayer in pairs(Players:GetPlayers()) do
         if otherPlayer ~= LocalPlayer then
             local character = otherPlayer.Character
@@ -713,6 +941,12 @@ local function updateESP()
                     
                     highlight.Parent = character
                     highlightObjects[otherPlayer] = highlight
+                else
+                    local isEnemyState = isEnemy(otherPlayer)
+                    local correctColor = isEnemyState and Color3.fromRGB(255, 50, 100) or Color3.fromRGB(0, 255, 150)
+                    if highlight.FillColor ~= correctColor then
+                        highlight.FillColor = correctColor
+                    end
                 end
             else
                 if highlightObjects[otherPlayer] then
@@ -735,20 +969,24 @@ local function toggleESP()
     espEnabled = not espEnabled
     
     if espEnabled then
+        refreshLocalTeam()
         updateESP()
-        espBtn.Text = "CHAMS ESP   ON"
-        espBtn.BackgroundColor3 = Color3.fromRGB(190, 90, 255)
+        espBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         espStroke.Transparency = 0
+        espBtn.Text = "  CHAMS ESP  ● ON"
+        TweenService:Create(espBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(0, 255, 0)}):Play()
+        TweenService:Create(espBtn, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundColor3 = Color3.fromRGB(0, 255, 100)}):Play()
     else
         clearESP()
-        espBtn.Text = "CHAMS ESP   OFF"
-        espBtn.BackgroundColor3 = Color3.fromRGB(32, 28, 48)
-        espStroke.Transparency = 0.5
+        espBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
+        espStroke.Transparency = 0.3
+        espBtn.Text = "  CHAMS ESP  ○ OFF"
+        TweenService:Create(espBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
     end
 end
 
 Players.PlayerAdded:Connect(function()
-    if espEnabled then task.wait(0.5) updateESP() end
+    if espEnabled then task.wait(0.5) refreshLocalTeam() updateESP() end
 end)
 
 Players.PlayerRemoving:Connect(function(player)
@@ -756,7 +994,7 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 LocalPlayer.CharacterAdded:Connect(function()
-    if espEnabled then task.wait(0.5) updateESP() end
+    if espEnabled then task.wait(0.5) refreshLocalTeam() updateESP() end
 end)
 
 RunService.RenderStepped:Connect(function()
@@ -766,14 +1004,17 @@ end)
 perfectShootBtn.MouseButton1Click:Connect(function()
     perfectShootEnabled = not perfectShootEnabled
     if perfectShootEnabled then
-        perfectShootBtn.Text = "PERFECT SHOOT   ON"
-        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(190, 90, 255)
+        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         psStroke.Transparency = 0
+        perfectShootBtn.Text = "  PERFECT SHOOT  ● ON"
+        TweenService:Create(perfectShootBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(0, 255, 0)}):Play()
+        TweenService:Create(perfectShootBtn, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundColor3 = Color3.fromRGB(0, 255, 100)}):Play()
         enablePerfectShoot()
     else
-        perfectShootBtn.Text = "PERFECT SHOOT   OFF"
-        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(32, 28, 48)
-        psStroke.Transparency = 0.5
+        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
+        psStroke.Transparency = 0.3
+        perfectShootBtn.Text = "  PERFECT SHOOT  ○ OFF"
+        TweenService:Create(perfectShootBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
         disablePerfectShoot()
     end
 end)
@@ -789,13 +1030,16 @@ end)
 aimKillBtn.MouseButton1Click:Connect(function()
     aimKillEnabled = not aimKillEnabled
     if aimKillEnabled then
-        aimKillBtn.Text = "AIM KILL   ON"
-        aimKillBtn.BackgroundColor3 = Color3.fromRGB(190, 90, 255)
+        aimKillBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
         akStroke.Transparency = 0
+        aimKillBtn.Text = "  AIM KILL  ● ON"
+        TweenService:Create(aimKillBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(0, 255, 0)}):Play()
+        TweenService:Create(aimKillBtn, TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {BackgroundColor3 = Color3.fromRGB(0, 255, 100)}):Play()
     else
-        aimKillBtn.Text = "AIM KILL   OFF"
-        aimKillBtn.BackgroundColor3 = Color3.fromRGB(32, 28, 48)
-        akStroke.Transparency = 0.5
+        aimKillBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
+        akStroke.Transparency = 0.3
+        aimKillBtn.Text = "  AIM KILL  ○ OFF"
+        TweenService:Create(aimKillBtn, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(100, 70, 150)}):Play()
     end
 end)
 
