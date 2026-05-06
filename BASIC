@@ -31,8 +31,8 @@ screenGui.Parent = playerGui
 
 local button = Instance.new("ImageButton")
 button.Name = "DraggableButton"
-button.Size = UDim2.new(0, 55, 0, 55)
-button.Position = UDim2.new(1, -70, 0, 20)
+button.Size = UDim2.new(0, 50, 0, 50)
+button.Position = UDim2.new(1, -65, 0, 15)
 button.BackgroundTransparency = 1
 button.Image = "rbxassetid://78192826150107"
 button.ImageColor3 = Color3.fromRGB(190, 90, 255)
@@ -44,7 +44,7 @@ btnCorner.CornerRadius = UDim.new(1, 0)
 btnCorner.Parent = button
 
 local btnStroke = Instance.new("UIStroke")
-btnStroke.Thickness = 4
+btnStroke.Thickness = 2.5
 btnStroke.Color = Color3.fromRGB(255, 100, 255)
 btnStroke.Transparency = 0.2
 btnStroke.Parent = button
@@ -52,170 +52,379 @@ btnStroke.Parent = button
 local btnGradient = Instance.new("UIGradient")
 btnGradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 200)),
-    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(190, 90, 255)),
-    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(255, 100, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 80, 255)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 50, 220))
 }
 btnGradient.Parent = btnStroke
 
 local btnGlow = Instance.new("ImageLabel")
-btnGlow.Size = UDim2.new(1.4, 0, 1.4, 0)
-btnGlow.Position = UDim2.new(-0.2, 0, -0.2, 0)
+btnGlow.Size = UDim2.new(1.5, 0, 1.5, 0)
+btnGlow.Position = UDim2.new(-0.25, 0, -0.25, 0)
 btnGlow.BackgroundTransparency = 1
 btnGlow.Image = "rbxassetid://13135718668"
 btnGlow.ImageColor3 = Color3.fromRGB(255, 100, 255)
-btnGlow.ImageTransparency = 0.4
+btnGlow.ImageTransparency = 0.5
 btnGlow.ZIndex = 0
 btnGlow.Parent = button
 
 local menu = Instance.new("Frame")
 menu.Name = "MenuPopup"
-menu.Size = UDim2.new(0, 280, 0, 380)
-menu.BackgroundColor3 = Color3.fromRGB(30, 25, 45)
-menu.BackgroundTransparency = 0.05
+menu.Size = UDim2.new(0, 240, 0, 340)
+menu.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
+menu.BackgroundTransparency = 0.03
 menu.Visible = false
+menu.ClipsDescendants = true
 menu.Parent = screenGui
 
 local menuCorner = Instance.new("UICorner")
-menuCorner.CornerRadius = UDim.new(0, 15)
+menuCorner.CornerRadius = UDim.new(0, 10)
 menuCorner.Parent = menu
 
 local menuStroke = Instance.new("UIStroke")
-menuStroke.Thickness = 3
+menuStroke.Thickness = 1.5
 menuStroke.Color = Color3.fromRGB(180, 80, 255)
-menuStroke.Transparency = 0.3
+menuStroke.Transparency = 0.15
 menuStroke.Parent = menu
 
 local menuGradient = Instance.new("UIGradient")
 menuGradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 80, 255)),
-    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(160, 70, 220)),
-    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(200, 90, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(160, 70, 220)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 50, 200))
 }
 menuGradient.Parent = menuStroke
 
-local menuGlow = Instance.new("ImageLabel")
-menuGlow.Size = UDim2.new(1.08, 0, 1.08, 0)
-menuGlow.Position = UDim2.new(-0.04, 0, -0.04, 0)
-menuGlow.BackgroundTransparency = 1
-menuGlow.Image = "rbxassetid://13135718668"
-menuGlow.ImageColor3 = Color3.fromRGB(180, 80, 255)
-menuGlow.ImageTransparency = 0.6
-menuGlow.ZIndex = 0
-menuGlow.Parent = menu
+local borderContainer = Instance.new("Frame")
+borderContainer.Size = UDim2.new(1, 0, 1, 0)
+borderContainer.BackgroundTransparency = 1
+borderContainer.ZIndex = 10
+borderContainer.Parent = menu
+
+local borderTop = Instance.new("Frame")
+borderTop.Size = UDim2.new(1, 0, 0, 1.5)
+borderTop.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+borderTop.BorderSizePixel = 0
+borderTop.Parent = borderContainer
+
+local borderTopGrad = Instance.new("UIGradient")
+borderTopGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 200)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 100, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 50, 255))
+}
+borderTopGrad.Parent = borderTop
+
+local borderBottom = Instance.new("Frame")
+borderBottom.Size = UDim2.new(1, 0, 0, 1.5)
+borderBottom.Position = UDim2.new(0, 0, 1, -1.5)
+borderBottom.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+borderBottom.BorderSizePixel = 0
+borderBottom.Parent = borderContainer
+
+local borderBottomGrad = Instance.new("UIGradient")
+borderBottomGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 50, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 100, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 50, 200))
+}
+borderBottomGrad.Parent = borderBottom
+
+local borderLeft = Instance.new("Frame")
+borderLeft.Size = UDim2.new(0, 1.5, 1, 0)
+borderLeft.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+borderLeft.BorderSizePixel = 0
+borderLeft.Parent = borderContainer
+
+local borderLeftGrad = Instance.new("UIGradient")
+borderLeftGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 100, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 50, 255))
+}
+borderLeftGrad.Rotation = 90
+borderLeftGrad.Parent = borderLeft
+
+local borderRight = Instance.new("Frame")
+borderRight.Size = UDim2.new(0, 1.5, 1, 0)
+borderRight.Position = UDim2.new(1, -1.5, 0, 0)
+borderRight.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+borderRight.BorderSizePixel = 0
+borderRight.Parent = borderContainer
+
+local borderRightGrad = Instance.new("UIGradient")
+borderRightGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 50, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 255))
+}
+borderRightGrad.Rotation = 90
+borderRightGrad.Parent = borderRight
+
+local cornerGlows = {}
+for i = 1, 4 do
+    local glow = Instance.new("ImageLabel")
+    glow.Size = UDim2.new(0, 30, 0, 30)
+    glow.BackgroundTransparency = 1
+    glow.Image = "rbxassetid://13135718668"
+    glow.ImageColor3 = Color3.fromRGB(200, 100, 255)
+    glow.ImageTransparency = 0.6
+    glow.ZIndex = 9
+    glow.Parent = borderContainer
+    table.insert(cornerGlows, glow)
+end
+cornerGlows[1].Position = UDim2.new(0, -15, 0, -15)
+cornerGlows[2].Position = UDim2.new(1, -15, 0, -15)
+cornerGlows[3].Position = UDim2.new(0, -15, 1, -15)
+cornerGlows[4].Position = UDim2.new(1, -15, 1, -15)
+
+local particlesContainer = Instance.new("Frame")
+particlesContainer.Size = UDim2.new(1, 0, 1, 0)
+particlesContainer.BackgroundTransparency = 1
+particlesContainer.ZIndex = 8
+particlesContainer.Parent = menu
+
+local menuParticles = {}
+for i = 1, 8 do
+    local dot = Instance.new("Frame")
+    dot.Size = UDim2.new(0, 3, 0, 3)
+    dot.BackgroundColor3 = Color3.fromRGB(200, 150, 255)
+    dot.BorderSizePixel = 0
+    dot.ZIndex = 8
+    dot.Parent = particlesContainer
+    local dotCorner = Instance.new("UICorner")
+    dotCorner.CornerRadius = UDim.new(1, 0)
+    dotCorner.Parent = dot
+    table.insert(menuParticles, {
+        obj = dot,
+        speed = 0.3 + math.random() * 1.2,
+        offset = math.random() * math.pi * 2,
+        radius = 0.25 + math.random() * 0.45,
+        baseY = math.random()
+    })
+end
+
+local scanLine = Instance.new("Frame")
+scanLine.Size = UDim2.new(1, 0, 0, 1)
+scanLine.BackgroundColor3 = Color3.fromRGB(200, 150, 255)
+scanLine.BackgroundTransparency = 0.5
+scanLine.BorderSizePixel = 0
+scanLine.ZIndex = 6
+scanLine.Parent = menu
+
+local topGlow = Instance.new("ImageLabel")
+topGlow.Size = UDim2.new(1, 0, 0, 60)
+topGlow.BackgroundTransparency = 1
+topGlow.Image = "rbxassetid://13135718668"
+topGlow.ImageColor3 = Color3.fromRGB(150, 70, 255)
+topGlow.ImageTransparency = 0.7
+topGlow.ZIndex = 1
+topGlow.Parent = menu
 
 local menuImg = Instance.new("ImageLabel")
-menuImg.Size = UDim2.new(0, 45, 0, 45)
-menuImg.Position = UDim2.new(0.5, -22.5, 0, 8)
+menuImg.Size = UDim2.new(0, 35, 0, 35)
+menuImg.Position = UDim2.new(0.5, -17.5, 0, 8)
 menuImg.BackgroundTransparency = 1
 menuImg.Image = "rbxassetid://78192826150107"
 menuImg.ImageColor3 = Color3.fromRGB(200, 100, 255)
+menuImg.ZIndex = 15
 menuImg.Parent = menu
 
 local imgCorner = Instance.new("UICorner")
 imgCorner.CornerRadius = UDim.new(1, 0)
 imgCorner.Parent = menuImg
 
+local imgGlow = Instance.new("ImageLabel")
+imgGlow.Size = UDim2.new(1.8, 0, 1.8, 0)
+imgGlow.Position = UDim2.new(-0.4, 0, -0.4, 0)
+imgGlow.BackgroundTransparency = 1
+imgGlow.Image = "rbxassetid://13135718668"
+imgGlow.ImageColor3 = Color3.fromRGB(200, 100, 255)
+imgGlow.ImageTransparency = 0.55
+imgGlow.ZIndex = 14
+imgGlow.Parent = menuImg
+
 local header = Instance.new("Frame")
-header.Size = UDim2.new(1, 0, 0, 45)
-header.Position = UDim2.new(0, 0, 0, 58)
-header.BackgroundColor3 = Color3.fromRGB(180, 70, 255)
+header.Size = UDim2.new(1, 0, 0, 38)
+header.Position = UDim2.new(0, 0, 0, 48)
+header.BackgroundColor3 = Color3.fromRGB(170, 65, 250)
+header.ZIndex = 15
 header.Parent = menu
 
 local headerCorner = Instance.new("UICorner")
-headerCorner.CornerRadius = UDim.new(0, 15)
+headerCorner.CornerRadius = UDim.new(0, 10)
 headerCorner.Parent = header
 
+local headerGlow = Instance.new("ImageLabel")
+headerGlow.Size = UDim2.new(1.15, 0, 1.5, 0)
+headerGlow.Position = UDim2.new(-0.075, 0, -0.25, 0)
+headerGlow.BackgroundTransparency = 1
+headerGlow.Image = "rbxassetid://13135718668"
+headerGlow.ImageColor3 = Color3.fromRGB(170, 65, 250)
+headerGlow.ImageTransparency = 0.55
+headerGlow.ZIndex = 14
+headerGlow.Parent = header
+
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -10, 1, 0)
-title.Position = UDim2.new(0, 5, 0, 0)
+title.Size = UDim2.new(1, -8, 1, 0)
+title.Position = UDim2.new(0, 4, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "JOS1K"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 15
+title.TextSize = 13
 title.Font = Enum.Font.GothamBold
 title.TextStrokeTransparency = 0.3
 title.TextStrokeColor3 = Color3.fromRGB(255, 0, 255)
+title.ZIndex = 16
 title.Parent = header
+
+local separatorLine = Instance.new("Frame")
+separatorLine.Size = UDim2.new(0.9, 0, 0, 1)
+separatorLine.Position = UDim2.new(0.05, 0, 0, 90)
+separatorLine.BackgroundColor3 = Color3.fromRGB(180, 80, 255)
+separatorLine.BackgroundTransparency = 0.5
+separatorLine.BorderSizePixel = 0
+separatorLine.ZIndex = 12
+separatorLine.Parent = menu
+
+local function animateButton(btn, isActive)
+    local originalSize = btn.Size
+    local scaleSize = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, originalSize.Y.Scale, originalSize.Y.Offset * 0.93)
+    local tween1 = TweenService:Create(btn, TweenInfo.new(0.06, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = scaleSize})
+    tween1:Play()
+    tween1.Completed:Connect(function()
+        local tween2 = TweenService:Create(btn, TweenInfo.new(0.06, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Size = originalSize})
+        tween2:Play()
+    end)
+end
 
 local function createToggle(text, yPos)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 38)
+    btn.Size = UDim2.new(0.9, 0, 0, 32)
     btn.Position = UDim2.new(0.05, 0, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-    btn.Text = text .. "  O OFF"
+    btn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+    btn.Text = "  " .. text .. "  OFF"
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 13
+    btn.TextSize = 11
     btn.Font = Enum.Font.GothamBold
     btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.ZIndex = 12
+    btn.AutoButtonColor = false
     btn.Parent = menu
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 7)
     corner.Parent = btn
     
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(200, 100, 255)
-    stroke.Thickness = 2
-    stroke.Transparency = 0.3
+    stroke.Color = Color3.fromRGB(180, 90, 255)
+    stroke.Thickness = 1.5
+    stroke.Transparency = 0.25
     stroke.Parent = btn
+    
+    local btnGlowImg = Instance.new("ImageLabel")
+    btnGlowImg.Size = UDim2.new(1.06, 0, 1.4, 0)
+    btnGlowImg.Position = UDim2.new(-0.03, 0, -0.2, 0)
+    btnGlowImg.BackgroundTransparency = 1
+    btnGlowImg.Image = "rbxassetid://13135718668"
+    btnGlowImg.ImageColor3 = Color3.fromRGB(180, 100, 255)
+    btnGlowImg.ImageTransparency = 0.8
+    btnGlowImg.ZIndex = 11
+    btnGlowImg.Visible = false
+    btnGlowImg.Parent = btn
+    
+    btn.MouseEnter:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(110, 80, 160)}):Play()
+        btnGlowImg.Visible = true
+        TweenService:Create(btnGlowImg, TweenInfo.new(0.2), {ImageTransparency = 0.45}):Play()
+    end)
+    
+    btn.MouseLeave:Connect(function()
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 60, 140)}):Play()
+        TweenService:Create(btnGlowImg, TweenInfo.new(0.2), {ImageTransparency = 0.8}):Play()
+        task.wait(0.2)
+        btnGlowImg.Visible = false
+    end)
     
     return btn, stroke
 end
 
-local perfectShootBtn, psStroke = createToggle(" PERFECT SHOOT", 105)
-local autoShootBtn, asStroke = createToggle(" AUTO SHOOT", 148)
-local espBtn, espStroke = createToggle(" CHAMS ESP", 191)
-local aimKillBtn, akStroke = createToggle(" AIM KILL", 234)
+local perfectShootBtn, psStroke = createToggle("PERFECT SHOOT", 95)
+local autoShootBtn, asStroke = createToggle("AUTO SHOOT", 132)
+local espBtn, espStroke = createToggle("CHAMS ESP", 169)
+local aimKillBtn, akStroke = createToggle("AIM KILL", 206)
 
 local hitboxFrame = Instance.new("Frame")
-hitboxFrame.Size = UDim2.new(0.9, 0, 0, 70)
-hitboxFrame.Position = UDim2.new(0.05, 0, 0, 277)
-hitboxFrame.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-hitboxFrame.BackgroundTransparency = 0.3
+hitboxFrame.Size = UDim2.new(0.9, 0, 0, 80)
+hitboxFrame.Position = UDim2.new(0.05, 0, 0, 243)
+hitboxFrame.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+hitboxFrame.BackgroundTransparency = 0.35
+hitboxFrame.ZIndex = 12
 hitboxFrame.Parent = menu
 
 local hitboxCorner = Instance.new("UICorner")
-hitboxCorner.CornerRadius = UDim.new(0, 8)
+hitboxCorner.CornerRadius = UDim.new(0, 7)
 hitboxCorner.Parent = hitboxFrame
 
 local hitboxStroke = Instance.new("UIStroke")
-hitboxStroke.Color = Color3.fromRGB(200, 100, 255)
-hitboxStroke.Thickness = 2
-hitboxStroke.Transparency = 0.3
+hitboxStroke.Color = Color3.fromRGB(180, 90, 255)
+hitboxStroke.Thickness = 1.5
+hitboxStroke.Transparency = 0.25
 hitboxStroke.Parent = hitboxFrame
 
+local hitboxTitle = Instance.new("TextLabel")
+hitboxTitle.Size = UDim2.new(0.9, 0, 0, 14)
+hitboxTitle.Position = UDim2.new(0.05, 0, 0, 3)
+hitboxTitle.BackgroundTransparency = 1
+hitboxTitle.Text = "HITBOX EXPANDER"
+hitboxTitle.TextColor3 = Color3.fromRGB(200, 180, 255)
+hitboxTitle.TextSize = 9
+hitboxTitle.Font = Enum.Font.GothamBold
+hitboxTitle.ZIndex = 13
+hitboxTitle.Parent = hitboxFrame
+
 local hitboxBtn = Instance.new("TextButton")
-hitboxBtn.Size = UDim2.new(0.45, 0, 0, 28)
-hitboxBtn.Position = UDim2.new(0.03, 0, 0.1, 0)
-hitboxBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-hitboxBtn.Text = " HITBOX O OFF"
+hitboxBtn.Size = UDim2.new(0.45, 0, 0, 24)
+hitboxBtn.Position = UDim2.new(0.03, 0, 0, 20)
+hitboxBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+hitboxBtn.Text = " OFF"
 hitboxBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-hitboxBtn.TextSize = 11
+hitboxBtn.TextSize = 10
 hitboxBtn.Font = Enum.Font.GothamBold
+hitboxBtn.ZIndex = 13
+hitboxBtn.AutoButtonColor = false
 hitboxBtn.Parent = hitboxFrame
 
 local hitboxBtnCorner = Instance.new("UICorner")
-hitboxBtnCorner.CornerRadius = UDim.new(0, 6)
+hitboxBtnCorner.CornerRadius = UDim.new(0, 5)
 hitboxBtnCorner.Parent = hitboxBtn
 
-local hitboxSizeLabel = Instance.new("TextLabel")
-hitboxSizeLabel.Size = UDim2.new(0.45, 0, 0, 20)
-hitboxSizeLabel.Position = UDim2.new(0.03, 0, 0.55, 0)
-hitboxSizeLabel.BackgroundTransparency = 1
-hitboxSizeLabel.Text = "Tamanio: " .. hitboxSize
-hitboxSizeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-hitboxSizeLabel.TextSize = 11
-hitboxSizeLabel.Font = Enum.Font.GothamBold
-hitboxSizeLabel.TextXAlignment = Enum.TextXAlignment.Left
-hitboxSizeLabel.Parent = hitboxFrame
+local hitboxValueInput = Instance.new("TextBox")
+hitboxValueInput.Size = UDim2.new(0.45, 0, 0, 24)
+hitboxValueInput.Position = UDim2.new(0.52, 0, 0, 20)
+hitboxValueInput.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+hitboxValueInput.Text = tostring(hitboxSize)
+hitboxValueInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+hitboxValueInput.TextSize = 12
+hitboxValueInput.Font = Enum.Font.GothamBold
+hitboxValueInput.PlaceholderText = "1-50"
+hitboxValueInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+hitboxValueInput.ZIndex = 13
+hitboxValueInput.Parent = hitboxFrame
+
+local hitboxInputCorner = Instance.new("UICorner")
+hitboxInputCorner.CornerRadius = UDim.new(0, 5)
+hitboxInputCorner.Parent = hitboxValueInput
+
+local hitboxInputStroke = Instance.new("UIStroke")
+hitboxInputStroke.Color = Color3.fromRGB(0, 180, 255)
+hitboxInputStroke.Thickness = 1.2
+hitboxInputStroke.Transparency = 0.35
+hitboxInputStroke.Parent = hitboxValueInput
 
 local sliderBg = Instance.new("Frame")
-sliderBg.Size = UDim2.new(0.45, 0, 0, 8)
-sliderBg.Position = UDim2.new(0.52, 0, 0.6, 0)
-sliderBg.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+sliderBg.Size = UDim2.new(0.9, 0, 0, 6)
+sliderBg.Position = UDim2.new(0.05, 0, 0, 50)
+sliderBg.BackgroundColor3 = Color3.fromRGB(45, 35, 65)
 sliderBg.BackgroundTransparency = 0.5
+sliderBg.ZIndex = 13
 sliderBg.Parent = hitboxFrame
 
 local sliderCorner = Instance.new("UICorner")
@@ -223,43 +432,49 @@ sliderCorner.CornerRadius = UDim.new(1, 0)
 sliderCorner.Parent = sliderBg
 
 local sliderFill = Instance.new("Frame")
-sliderFill.Size = UDim2.new((hitboxSize - 1) / 19, 0, 1, 0)
-sliderFill.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+sliderFill.Size = UDim2.new((hitboxSize - 1) / 49, 0, 1, 0)
+sliderFill.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
+sliderFill.ZIndex = 14
 sliderFill.Parent = sliderBg
 
 local sliderCornerFill = Instance.new("UICorner")
 sliderCornerFill.CornerRadius = UDim.new(1, 0)
 sliderCornerFill.Parent = sliderFill
 
-local hitboxValue = Instance.new("TextBox")
-hitboxValue.Size = UDim2.new(0.2, 0, 0, 22)
-hitboxValue.Position = UDim2.new(0.77, 0, 0.55, 0)
-hitboxValue.BackgroundColor3 = Color3.fromRGB(70, 50, 110)
-hitboxValue.Text = tostring(hitboxSize)
-hitboxValue.TextColor3 = Color3.fromRGB(255, 255, 255)
-hitboxValue.TextSize = 11
-hitboxValue.Font = Enum.Font.GothamBold
-hitboxValue.Parent = hitboxFrame
-
-local hitboxValueCorner = Instance.new("UICorner")
-hitboxValueCorner.CornerRadius = UDim.new(0, 4)
-hitboxValueCorner.Parent = hitboxValue
+local sizeLabel = Instance.new("TextLabel")
+sizeLabel.Size = UDim2.new(0.9, 0, 0, 12)
+sizeLabel.Position = UDim2.new(0.05, 0, 0, 62)
+sizeLabel.BackgroundTransparency = 1
+sizeLabel.Text = "Size: " .. hitboxSize
+sizeLabel.TextColor3 = Color3.fromRGB(180, 180, 200)
+sizeLabel.TextSize = 9
+sizeLabel.Font = Enum.Font.Gotham
+sizeLabel.TextXAlignment = Enum.TextXAlignment.Center
+sizeLabel.ZIndex = 13
+sizeLabel.Parent = hitboxFrame
 
 local function storeOriginalHitbox(player)
     if not originalHitboxSizes[player] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local hrp = player.Character.HumanoidRootPart
-        originalHitboxSizes[player] = hrp.Size
+        originalHitboxSizes[player] = {
+            Size = hrp.Size,
+            Transparency = hrp.Transparency,
+            Color = hrp.Color,
+            Material = hrp.Material,
+            CanCollide = hrp.CanCollide
+        }
     end
 end
 
 local function restoreOriginalHitbox(player)
     if originalHitboxSizes[player] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local hrp = player.Character.HumanoidRootPart
-        hrp.Size = originalHitboxSizes[player]
-        hrp.Transparency = 0
-        hrp.Color = Color3.fromRGB(255, 255, 255)
-        hrp.Material = Enum.Material.Plastic
-        hrp.CanCollide = true
+        local original = originalHitboxSizes[player]
+        hrp.Size = original.Size
+        hrp.Transparency = original.Transparency
+        hrp.Color = original.Color
+        hrp.Material = original.Material
+        hrp.CanCollide = original.CanCollide
         originalHitboxSizes[player] = nil
     end
 end
@@ -288,9 +503,7 @@ local function updateHitboxPlayers()
 end
 
 local function applyHitbox()
-    if not hitboxEnabled then 
-        return 
-    end
+    if not hitboxEnabled then return end
     
     for _, v in pairs(affectedPlayers) do
         if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
@@ -319,12 +532,11 @@ local function applyHitbox()
 end
 
 local function enableHitbox()
-    if hitboxEnabled then 
-        return 
-    end
+    if hitboxEnabled then return end
     hitboxEnabled = true
-    hitboxBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-    hitboxBtn.Text = " HITBOX O ON"
+    hitboxBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 50)
+    hitboxBtn.Text = " ON"
+    animateButton(hitboxBtn, true)
     
     updateHitboxPlayers()
     
@@ -336,12 +548,11 @@ local function enableHitbox()
 end
 
 local function disableHitbox()
-    if not hitboxEnabled then 
-        return 
-    end
+    if not hitboxEnabled then return end
     hitboxEnabled = false
-    hitboxBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-    hitboxBtn.Text = " HITBOX O OFF"
+    hitboxBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+    hitboxBtn.Text = " OFF"
+    animateButton(hitboxBtn, false)
     
     for _, v in pairs(affectedPlayers) do
         restoreOriginalHitbox(v)
@@ -349,15 +560,13 @@ local function disableHitbox()
 end
 
 local function setHitboxSize(newSize)
-    local clampedSize = math.clamp(newSize, 1, 20)
-    if hitboxSize == clampedSize then
-        return
-    end
+    local clampedSize = math.clamp(newSize, 1, 50)
+    if hitboxSize == clampedSize then return end
     
     hitboxSize = clampedSize
-    hitboxSizeLabel.Text = "Tamanio: " .. hitboxSize
-    hitboxValue.Text = tostring(hitboxSize)
-    sliderFill.Size = UDim2.new((hitboxSize - 1) / 19, 0, 1, 0)
+    sliderFill.Size = UDim2.new((hitboxSize - 1) / 49, 0, 1, 0)
+    hitboxValueInput.Text = tostring(hitboxSize)
+    sizeLabel.Text = "Size: " .. hitboxSize
     
     if hitboxEnabled then
         applyHitbox()
@@ -372,12 +581,14 @@ hitboxBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-hitboxValue.FocusLost:Connect(function()
-    local num = tonumber(hitboxValue.Text)
-    if num then
-        setHitboxSize(num)
-    else
-        setHitboxSize(hitboxSize)
+hitboxValueInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local value = tonumber(hitboxValueInput.Text)
+        if value then
+            setHitboxSize(math.floor(value))
+        else
+            hitboxValueInput.Text = tostring(hitboxSize)
+        end
     end
 end)
 
@@ -386,7 +597,7 @@ sliderBg.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         draggingSlider = true
         local xPos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
-        local newSize = math.floor(1 + (xPos * 19))
+        local newSize = math.floor(1 + (xPos * 49))
         setHitboxSize(newSize)
     end
 end)
@@ -394,7 +605,7 @@ end)
 UIS.InputChanged:Connect(function(input)
     if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local xPos = math.clamp((input.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
-        local newSize = math.floor(1 + (xPos * 19))
+        local newSize = math.floor(1 + (xPos * 49))
         setHitboxSize(newSize)
     end
 end)
@@ -722,7 +933,6 @@ button.InputBegan:Connect(function(input)
         dragging = true
         dragStart = input.Position
         startPos = button.Position
-        TweenService:Create(button, TweenInfo.new(0.1), {Size = UDim2.new(0, 60, 0, 60)}):Play()
     end
 end)
 
@@ -737,7 +947,6 @@ end)
 button.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
-        TweenService:Create(button, TweenInfo.new(0.1), {Size = UDim2.new(0, 55, 0, 55)}):Play()
     end
 end)
 
@@ -769,78 +978,109 @@ end)
 
 button.MouseButton1Click:Connect(function()
     if menu.Visible then
-        TweenService:Create(menu, TweenInfo.new(0.15), {BackgroundTransparency = 1}):Play()
-        task.wait(0.1)
+        TweenService:Create(menu, TweenInfo.new(0.12), {BackgroundTransparency = 1}):Play()
+        task.wait(0.08)
         menu.Visible = false
     else
         local buttonPos = button.AbsolutePosition
+        local buttonSize = button.AbsoluteSize
         local menuSize = menu.AbsoluteSize
-        local targetX = buttonPos.X - menuSize.X - 5
+        local screenSize = screenGui.AbsoluteSize
+        
+        local targetX = buttonPos.X - menuSize.X - 8
+        if targetX < 0 then
+            targetX = buttonPos.X + buttonSize.X + 8
+        end
+        if targetX + menuSize.X > screenSize.X then
+            targetX = screenSize.X - menuSize.X - 5
+        end
+        
         local targetY = buttonPos.Y - 20
-        menu.Position = UDim2.new(0, targetX, 0, targetY - 55)
-        menu.BackgroundTransparency = 0.05
+        if targetY < 5 then
+            targetY = 5
+        end
+        if targetY + menuSize.Y > screenSize.Y then
+            targetY = screenSize.Y - menuSize.Y - 5
+        end
+        
+        menu.Position = UDim2.new(0, targetX, 0, targetY)
+        menu.BackgroundTransparency = 1
         menu.Visible = true
-        TweenService:Create(menu, TweenInfo.new(0.2), {BackgroundTransparency = 0.05}):Play()
+        TweenService:Create(menu, TweenInfo.new(0.18, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {BackgroundTransparency = 0.03}):Play()
+        
+        local bounceTween = TweenService:Create(menu, TweenInfo.new(0.08, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0, targetX + 2, 0, targetY + 2)
+        })
+        bounceTween:Play()
+        bounceTween.Completed:Connect(function()
+            TweenService:Create(menu, TweenInfo.new(0.04), {
+                Position = UDim2.new(0, targetX, 0, targetY)
+            }):Play()
+        end)
     end
 end)
 
 perfectShootBtn.MouseButton1Click:Connect(function()
     perfectShootEnabled = not perfectShootEnabled
     if perfectShootEnabled then
-        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        psStroke.Transparency = 0
-        perfectShootBtn.Text = " PERFECT SHOOT  O ON"
+        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(0, 220, 50)
+        psStroke.Color = Color3.fromRGB(0, 255, 80)
+        perfectShootBtn.Text = "  PERFECT SHOOT  ON"
         enablePerfectShoot()
     else
-        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-        psStroke.Transparency = 0.3
-        perfectShootBtn.Text = " PERFECT SHOOT  O OFF"
+        perfectShootBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+        psStroke.Color = Color3.fromRGB(180, 90, 255)
+        perfectShootBtn.Text = "  PERFECT SHOOT  OFF"
         disablePerfectShoot()
     end
+    animateButton(perfectShootBtn, perfectShootEnabled)
 end)
 
 autoShootBtn.MouseButton1Click:Connect(function()
     if autoShootEnabled then
         autoShootEnabled = false
-        autoShootBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-        asStroke.Transparency = 0.3
-        autoShootBtn.Text = " AUTO SHOOT  O OFF"
+        autoShootBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+        asStroke.Color = Color3.fromRGB(180, 90, 255)
+        autoShootBtn.Text = "  AUTO SHOOT  OFF"
     else
         autoShootEnabled = true
-        autoShootBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        asStroke.Transparency = 0
-        autoShootBtn.Text = " AUTO SHOOT  O ON"
+        autoShootBtn.BackgroundColor3 = Color3.fromRGB(0, 220, 50)
+        asStroke.Color = Color3.fromRGB(0, 255, 80)
+        autoShootBtn.Text = "  AUTO SHOOT  ON"
         task.spawn(autoShootLoop)
     end
+    animateButton(autoShootBtn, autoShootEnabled)
 end)
 
 espBtn.MouseButton1Click:Connect(function()
     espEnabled = not espEnabled
     if espEnabled then
-        espBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        espStroke.Transparency = 0
-        espBtn.Text = " CHAMS ESP  O ON"
+        espBtn.BackgroundColor3 = Color3.fromRGB(0, 220, 50)
+        espStroke.Color = Color3.fromRGB(0, 255, 80)
+        espBtn.Text = "  CHAMS ESP  ON"
         refreshLocalTeam()
         updateESP()
     else
-        espBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-        espStroke.Transparency = 0.3
-        espBtn.Text = " CHAMS ESP  O OFF"
+        espBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+        espStroke.Color = Color3.fromRGB(180, 90, 255)
+        espBtn.Text = "  CHAMS ESP  OFF"
         clearESP()
     end
+    animateButton(espBtn, espEnabled)
 end)
 
 aimKillBtn.MouseButton1Click:Connect(function()
     aimKillEnabled = not aimKillEnabled
     if aimKillEnabled then
-        aimKillBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        akStroke.Transparency = 0
-        aimKillBtn.Text = " AIM KILL  O ON"
+        aimKillBtn.BackgroundColor3 = Color3.fromRGB(0, 220, 50)
+        akStroke.Color = Color3.fromRGB(0, 255, 80)
+        aimKillBtn.Text = "  AIM KILL  ON"
     else
-        aimKillBtn.BackgroundColor3 = Color3.fromRGB(100, 70, 150)
-        akStroke.Transparency = 0.3
-        aimKillBtn.Text = " AIM KILL  O OFF"
+        aimKillBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+        akStroke.Color = Color3.fromRGB(180, 90, 255)
+        aimKillBtn.Text = "  AIM KILL  OFF"
     end
+    animateButton(aimKillBtn, aimKillEnabled)
 end)
 
 task.spawn(function()
@@ -888,9 +1128,14 @@ player.CharacterAdded:Connect(function()
     end
 end)
 
+local lastESPUpdate = 0
 RunService.RenderStepped:Connect(function()
     if espEnabled then
-        pcall(updateESP)
+        local now = tick()
+        if now - lastESPUpdate >= 1 then
+            pcall(updateESP)
+            lastESPUpdate = now
+        end
     end
     if hitboxEnabled then
         pcall(applyHitbox)
@@ -899,10 +1144,60 @@ end)
 
 task.spawn(function()
     while true do
-        btnGradient.Rotation = (btnGradient.Rotation + 4) % 360
-        btnStroke.Transparency = 0.1 + math.sin(tick() * 5) * 0.15
-        btnGlow.ImageTransparency = 0.3 + math.sin(tick() * 4) * 0.2
+        btnGradient.Rotation = (btnGradient.Rotation + 3) % 360
+        btnStroke.Transparency = 0.1 + math.sin(tick() * 4) * 0.12
+        btnGlow.ImageTransparency = 0.4 + math.sin(tick() * 3.5) * 0.2
+        btnGlow.Rotation = (btnGlow.Rotation + 1) % 360
         task.wait(0.02)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if menu.Visible then
+            menuGradient.Rotation = (menuGradient.Rotation + 2) % 360
+            
+            borderTopGrad.Rotation = (borderTopGrad.Rotation + 2.5) % 360
+            borderBottomGrad.Rotation = (borderBottomGrad.Rotation - 2.5) % 360
+            borderLeftGrad.Rotation = (borderLeftGrad.Rotation + 2.5) % 360
+            borderRightGrad.Rotation = (borderRightGrad.Rotation - 2.5) % 360
+            
+            borderTop.BackgroundTransparency = 0.3 + math.sin(tick() * 5) * 0.35
+            borderBottom.BackgroundTransparency = 0.3 + math.cos(tick() * 5) * 0.35
+            borderLeft.BackgroundTransparency = 0.3 + math.sin(tick() * 5 + 1) * 0.35
+            borderRight.BackgroundTransparency = 0.3 + math.cos(tick() * 5 + 1) * 0.35
+            
+            local scanPos = ((tick() * 0.4) % 1.4) - 0.2
+            scanLine.Position = UDim2.new(0, 0, scanPos, 0)
+            scanLine.BackgroundTransparency = 0.3 + math.sin(tick() * 6) * 0.5
+            
+            topGlow.ImageTransparency = 0.6 + math.sin(tick() * 3) * 0.25
+            
+            for _, pData in ipairs(menuParticles) do
+                if pData.obj and pData.obj.Parent then
+                    local angle = tick() * pData.speed + pData.offset
+                    local x = 0.5 + math.cos(angle) * pData.radius
+                    local y = pData.baseY + math.sin(angle * 1.5) * 0.15
+                    pData.obj.Position = UDim2.new(x, 0, y, 0)
+                    pData.obj.BackgroundTransparency = 0.2 + math.sin(tick() * 3 + pData.offset) * 0.5
+                end
+            end
+            
+            for i, cornerGlow in ipairs(cornerGlows) do
+                if cornerGlow and cornerGlow.Parent then
+                    cornerGlow.ImageTransparency = 0.4 + math.sin(tick() * 3.5 + i) * 0.35
+                    cornerGlow.Rotation = (cornerGlow.Rotation + (1 + i * 0.5)) % 360
+                    cornerGlow.Size = UDim2.new(0, 25 + math.sin(tick() * 4 + i) * 8, 0, 25 + math.sin(tick() * 4 + i) * 8)
+                end
+            end
+            
+            imgGlow.Rotation = (imgGlow.Rotation + 1.8) % 360
+            imgGlow.ImageTransparency = 0.45 + math.sin(tick() * 2.8) * 0.25
+            headerGlow.ImageTransparency = 0.45 + math.cos(tick() * 2.8) * 0.25
+            
+            separatorLine.BackgroundTransparency = 0.4 + math.sin(tick() * 3) * 0.3
+        end
+        task.wait(0.025)
     end
 end)
 
